@@ -1,5 +1,6 @@
 import tensorflow_datasets as tf_ds
 from tokenizer.SpaceTokenizer import SpaceTokenizer
+import tensorflow as tf
 
 def download_pt2en_corpus():
     examples, metadata = tf_ds.load('ted_hrlr_translate/pt_to_en', with_info=True, as_supervised=True)
@@ -56,12 +57,18 @@ def write_pt2en_vocabs():
     return pt_sample_list, en_sample_list
 
 
-pt_sample_list, en_sample_list = write_pt2en_vocabs()
-en_tokenizer = SpaceTokenizer('data/en_vocabs.txt', separator=' ', prefix_token="[START]", suffix_token="[END]")
-pt_tokenizer = SpaceTokenizer('data/pt_vocabs.txt', separator=' ', prefix_token=None, suffix_token=None)
-en_words_ids = en_tokenizer.sentences2ids(en_sample_list)
-pt_words_ids = pt_tokenizer.sentences2ids(pt_sample_list)
-print('pt_sample_list[:2]:', pt_sample_list[:2])
-print('en_sample_list[:2]:', en_sample_list[:2])
-print('en_words_list[:2]:', en_words_ids[:2])
-print('pt_words_list[:2]:', pt_words_ids[:2])
+def get_train_pairs():
+    pt_sample_list, en_sample_list = write_pt2en_vocabs()
+    en_tokenizer = SpaceTokenizer('data/en_vocabs.txt', separator=' ', prefix_token="[START]", suffix_token="[END]")
+    pt_tokenizer = SpaceTokenizer('data/pt_vocabs.txt', separator=' ', prefix_token=None, suffix_token=None)
+    en_words_ids = en_tokenizer.sentences2ids(en_sample_list)
+    pt_words_ids = pt_tokenizer.sentences2ids(pt_sample_list)
+    en_tensor = tf.ragged.constant(en_words_ids).to_tensor()
+    pt_tensor = tf.ragged.constant(pt_words_ids).to_tensor()
+    return en_tensor, pt_tensor
+
+
+if __name__ == '__main__':
+    en_words_ids, pt_words_ids = get_tokenized_ids()
+    print(en_words_ids[-1])
+    print(pt_words_ids[-1])
