@@ -1,1 +1,4 @@
-![image](https://github.com/lexsaints/powershell/blob/master/IMG/ps2.png)
+![image](resources/Transformer.png)
+![image](resources/Attention公式.png)
+![image](resources/ScaledDotProductAttention.png)
+![image](resources/MutiHeadAttention.png)
