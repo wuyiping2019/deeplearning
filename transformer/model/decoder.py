@@ -1,8 +1,8 @@
 import tensorflow as tf
 import keras.layers
-from MutiHeadAttention import MultiHeadAttention
-from point_wise_feed_forward_network import point_wise_feed_forward_network
-from positional_encoding import positional_encoding
+from transformer.model.muti_head_attention import MultiHeadAttention
+from transformer.model.point_wise_feed_forward_network import point_wise_feed_forward_network
+from transformer.model.positional_encoding import positional_encoding
 
 
 class DecoderLayer(keras.layers.Layer):
@@ -25,13 +25,10 @@ class DecoderLayer(keras.layers.Layer):
     def call(self, x, enc_output, training,
              look_ahead_mask, padding_mask):
         # enc_output.shape == (batch_size, input_seq_len, d_model)
-
         attn1, attn_weights_block1 = self.mha1(x, x, x, look_ahead_mask)  # (batch_size, target_seq_len, d_model)
         attn1 = self.dropout1(attn1, training=training)
         out1 = self.layernorm1(attn1 + x)
-
-        attn2, attn_weights_block2 = self.mha2(
-            enc_output, enc_output, out1, padding_mask)  # (batch_size, target_seq_len, d_model)
+        attn2, attn_weights_block2 = self.mha2(enc_output, enc_output, out1, padding_mask)  # (batch_size, target_seq_len, d_model)
         attn2 = self.dropout2(attn2, training=training)
         out2 = self.layernorm2(attn2 + out1)  # (batch_size, target_seq_len, d_model)
 
@@ -57,8 +54,7 @@ class Decoder(tf.keras.layers.Layer):
                            for _ in range(num_layers)]
         self.dropout = tf.keras.layers.Dropout(rate)
 
-    def call(self, x, enc_output, training,
-             look_ahead_mask, padding_mask):
+    def call(self, x, enc_output, training,look_ahead_mask, padding_mask):
         seq_len = tf.shape(x)[1]
         attention_weights = {}
 

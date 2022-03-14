@@ -69,6 +69,6 @@ def get_train_pairs():
 
 
 if __name__ == '__main__':
-    en_words_ids, pt_words_ids = get_tokenized_ids()
+    en_words_ids, pt_words_ids = get_train_pairs()
     print(en_words_ids[-1])
     print(pt_words_ids[-1])

@@ -2,14 +2,20 @@ import tensorflow as tf
 
 
 # 该函数用于标识序列中使用PAD填充的位置 用于忽略PAD
+# 在原始文本语句分词之后,需要统一长度,使用PAD进行填充
+# 然后将word转为word在所在词列表的索引,在设置索引时会将PAD放在词列表的第一个元素
+# 1)raggedTensor.to_tensor() 默认使用0填充
+# 2)tf.keras.preprocessing.sequence.pad_sequences(sample_list,maxlen=maxlen) 默认使用0填充
 def create_padding_mask(seq):
     """
-    :param seq: 输入的tensor
+    :param seq: 输入的tensor (batch_size,seq_len)
     :return: 将输入的tensor中表示PAD填充的位置标识出来 使用1标识 非PAD填充使用0标识
-             输出维度[batch,1,1,seq_len]
+             输出维度(batch,1,1,seq_len)
     """
     seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
     # add extra dimensions to add the padding to the attention logits.
+    # (batch_size,seq_len) -> (batch,1,1,seq_len)
+    # 原因：在MutiHeadAttention的计算中,输入和输出的shape为(batch_size,num_heads,seq_len,depth)
     return seq[:, tf.newaxis, tf.newaxis, :]
 
 

@@ -1,4 +1,3 @@
-from init import *
 import tensorflow as tf
 sample = \
     [
