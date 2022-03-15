@@ -2,6 +2,7 @@ import tensorflow as tf
 
 
 # 计算两个向量矩阵的余弦
+# input:tensor1 shape(A,)
 def tensor_cosine_similarity(tensor1: tf.Tensor, tensor2: tf.Tensor):
     """
     计算tensor1中每一个样本与tensor2中所有样本的余弦相似度
@@ -15,16 +16,17 @@ def tensor_cosine_similarity(tensor1: tf.Tensor, tensor2: tf.Tensor):
     """
     # 计算内积
     matmul = tf.matmul(tensor1, tf.transpose(tensor2))  # (tensor1_batch_size,tensor2_batch_size)
+    print(tf.shape(matmul))
     # 计算tensor1的欧式距离
-    tensor1_norm = tf.reshape(tf.sqrt(tf.reduce_sum(tf.square(tensor1), -1)),
-                              shape=(tensor1.shape[0], -1))  # (tensor1_batch_size,1)
+    tensor1_norm = tf.sqrt(tf.reduce_sum(tf.square(tensor1), -1))[:, tf.newaxis]  # (tensor1_batch_size,1)
+    print(tf.shape(tensor1_norm))
     # 计算tensor2的欧式距离
-    tensor2_norm = tf.reshape(tf.sqrt(tf.reduce_sum(tf.square(tensor2), -1)),
-                              shape=(-1, tensor1.shape[0]))  # (1,tensor2_batch_size)
+    tensor2_norm = tf.sqrt(tf.reduce_sum(tf.square(tensor2), -1))[tf.newaxis, :]  # (1,tensor2_batch_size)
+    print(tf.shape(tensor2_norm))
     return tf.divide(matmul, (tf.matmul(tensor1_norm, tensor2_norm)))
 
 
 if __name__ == '__main__':
-    tensor1 = tf.cast(tf.constant([[1, 2, 3], [1, 2, 3]]), tf.float32)
-    tensor2 = tf.cast(tf.constant([[2, 3, 3], [0, 2, 4]]), tf.float32)
+    tensor1 = tf.cast(tf.constant([[1, 2, 3], [0, 0, 0]]), tf.float32)
+    tensor2 = tf.cast(tf.constant([[2, 3, 3], [0, 2, 4], [0, 0, 0]]), tf.float32)
     print(tensor_cosine_similarity(tensor1, tensor2))
